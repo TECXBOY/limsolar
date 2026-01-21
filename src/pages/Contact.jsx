@@ -202,7 +202,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="text-white font-semibold mb-1">Office Location</h3>
-                    <p className="text-gray-400">Your Office Address</p>
+                    <p className="text-gray-400">Limkokwing.sl</p>
                   </div>
                 </div>
               </div>
