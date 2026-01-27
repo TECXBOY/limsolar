@@ -34,7 +34,7 @@ const Navbar = () => {
             <div className="w-10 h-10 bg-[#D4A574] rounded-full flex items-center justify-center">
               <div className="w-6 h-6 bg-black rounded-full"></div>
             </div>
-            <span className="text-[#FFEB3B] font-bold text-xl">LIM SOLAR</span>
+            <span className="text-[#FFEB3B] font-bold text-xl">LIMSOLAR</span>
           </Link>
 
           {/* Desktop Navigation */}
