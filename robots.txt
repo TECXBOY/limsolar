@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://limsolar.vercel.app/sitemap.xml
+
+Disallow: /dashboard/
+Disallow: /apply/
