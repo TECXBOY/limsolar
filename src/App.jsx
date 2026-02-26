@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import ProtectedRoute from './components/Auth/ProtectedRoute'
 import Navbar from './components/Layout/Navbar'
@@ -97,6 +98,7 @@ function App() {
             </Routes>
           </main>
           <Footer />
+          <SpeedInsights />
         </div>
       </Router>
     </AuthProvider>
