@@ -28,12 +28,37 @@ const Contact = () => {
     setSuccess(false)
 
     try {
+      // Send to Formspree (you get email notification!)
+      const formspreeResponse = await fetch('https://formspree.io/f/mvzblbyr', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.full_name,
+          email: formData.email,
+          phone: formData.phone,
+          company: formData.company_name || 'Not provided',
+          message: formData.message,
+          _subject: 'New Contact Form Submission - LIMSOLAR',
+        }),
+      })
+
+      if (!formspreeResponse.ok) {
+        throw new Error('Failed to send email notification')
+      }
+
+      // Also save to Supabase database
       const { error: submitError } = await supabase
         .from('contact_submissions')
         .insert([formData])
 
-      if (submitError) throw submitError
+      if (submitError) {
+        console.error('Supabase error:', submitError)
+        // Continue anyway - email was sent successfully
+      }
 
+      // Success!
       setSuccess(true)
       setFormData({
         full_name: '',
@@ -42,8 +67,12 @@ const Contact = () => {
         company_name: '',
         message: '',
       })
+
+      // Hide success message after 5 seconds
+      setTimeout(() => setSuccess(false), 5000)
+
     } catch (err) {
-      setError(err.message || 'Failed to submit form. Please try again.')
+      setError(err.message || 'Failed to submit form. Please try again or email us directly.')
     } finally {
       setLoading(false)
     }
@@ -73,12 +102,12 @@ const Contact = () => {
               <h2 className="text-2xl font-bold text-[#FFEB3B] mb-6">Send us a Message</h2>
               {success && (
                 <div className="mb-6 p-4 bg-green-900/30 border border-green-500 rounded-md text-green-400">
-                  Thank you for your message! We'll get back to you soon.
+                  ✅ Thank you for your message! We'll get back to you within 24 hours.
                 </div>
               )}
               {error && (
                 <div className="mb-6 p-4 bg-red-900/30 border border-red-500 rounded-md text-red-400">
-                  {error}
+                  ❌ {error}
                 </div>
               )}
               <form onSubmit={handleSubmit} className="space-y-6">
