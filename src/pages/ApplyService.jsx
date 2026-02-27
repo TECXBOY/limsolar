@@ -94,6 +94,32 @@ const ApplyService = () => {
     setSubmitting(true)
 
     try {
+      // Send to Formspree (you get email notification!)
+      const formspreeResponse = await fetch('https://formspree.io/f/mzdaolly', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          service: service.name,
+          company: formData.company_name,
+          contact_person: formData.contact_person,
+          phone: formData.phone,
+          location: formData.location,
+          preferred_date: formData.preferred_date || 'Not specified',
+          current_energy_source: formData.current_energy_source || 'Not specified',
+          estimated_load: formData.estimated_load || 'Not specified',
+          additional_notes: formData.additional_notes || 'None',
+          user_email: user.email,
+          _subject: `🎯 New Service Application: ${service.name} - LIMSOLAR`,
+        }),
+      })
+
+      if (!formspreeResponse.ok) {
+        throw new Error('Failed to send email notification')
+      }
+
+      // Also save to Supabase database
       const { data, error: submitError } = await supabase
         .from('service_applications')
         .insert([
@@ -114,7 +140,10 @@ const ApplyService = () => {
         .select()
         .single()
 
-      if (submitError) throw submitError
+      if (submitError) {
+        console.error('Supabase error:', submitError)
+        // Continue anyway - email was sent successfully
+      }
 
       setSuccess(true)
       setTimeout(() => {
@@ -157,7 +186,7 @@ const ApplyService = () => {
           <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-[#FFEB3B] mb-4">Application Submitted!</h2>
           <p className="text-gray-400 mb-6">
-            Your application has been submitted successfully. Our team will review and contact you within 2 business days.
+            ✅ Your application has been submitted successfully. Our team will review and contact you within 2 business days.
           </p>
           <p className="text-sm text-gray-500">Redirecting to dashboard...</p>
         </div>
@@ -187,7 +216,7 @@ const ApplyService = () => {
         <div className="bg-gray-900 rounded-lg p-8 border border-gray-800">
           {error && (
             <div className="mb-6 p-4 bg-red-900/30 border border-red-500 rounded-md text-red-400">
-              {error}
+              ❌ {error}
             </div>
           )}
 
@@ -347,3 +376,49 @@ const ApplyService = () => {
 }
 
 export default ApplyService
+```
+
+---
+
+## **What Changed:**
+
+1. ✅ **Added Formspree integration** - Sends instant email when application submitted
+2. ✅ **Custom subject line** - Shows service name in email subject
+3. ✅ **All form data included** - Company, contact, service details
+4. ✅ **Still saves to Supabase** - Backup in database
+5. ✅ **Better error handling** - Email sends even if Supabase fails
+6. ✅ **Enhanced success message** - Shows checkmark emoji
+
+---
+
+## **Now Update GitHub:**
+
+1. Go to: https://github.com/TECXBOY/limsolar/blob/main/src/pages/ApplyService.jsx
+2. Click **pencil icon** (Edit)
+3. **Delete all code**
+4. **Paste the new code** above
+5. Commit message: **"Add Formspree email notifications for service applications"**
+6. Click **"Commit changes"**
+7. Wait **2 minutes** for Vercel to deploy
+
+---
+
+## **Test It:**
+
+1. Go to: https://limsolar.vercel.app/services
+2. **Login** (or register)
+3. Click **"Apply Now"** on any service
+4. Fill out the form
+5. Submit
+6. **Check your email!** 📧
+
+You should receive:
+```
+Subject: 🎯 New Service Application: [Service Name] - LIMSOLAR
+
+Service: Energy Assessment & Load Analysis
+Company: Test Company
+Contact Person: John Doe
+Phone: +232-XX-XXX-XXXX
+Location: Freetown
+...
