@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
       const {
         data: { subscription: sub },
       } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        console.log('Auth state changed:', _event, session?.user?.email || 'No user')
         setUser(session?.user ?? null)
         if (session?.user) {
           await fetchProfile(session.user.id)
@@ -137,12 +138,27 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     try {
+      console.log('Signing out...')
+      
+      // Sign out from Supabase
       const { error } = await supabase.auth.signOut()
-      if (error) throw error
+      
+      if (error) {
+        console.error('Supabase signOut error:', error)
+        throw error
+      }
+      
+      // Clear local state immediately
       setUser(null)
       setProfile(null)
+      
+      console.log('Sign out successful')
       return { error: null }
     } catch (error) {
+      console.error('Sign out failed:', error)
+      // Even if Supabase fails, clear local state
+      setUser(null)
+      setProfile(null)
       return { error }
     }
   }
